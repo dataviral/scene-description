@@ -23,7 +23,7 @@ class SceneDescriptionDataset(torch.utils.data.Dataset):
     def __getitem__(self, i):
         question_id, answer_id, answer_vqa_id, img_num, map_name = self.data[i]
         question_id, answer_id = str(question_id), str(answer_id)
-        img_num = str(int(img_num) + 1) # fix the image num
+        if map_name != "sparky": img_num = str(int(img_num) + 1) # fix the image num
 
         question = self.mappings["qid_2_question"][question_id]
         answer = [self.mappings["vocab"]["word_2_wid"][word] for word in self.mappings["aid_2_answer"][answer_id].split()]
