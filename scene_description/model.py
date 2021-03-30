@@ -18,6 +18,10 @@ class LanguageInput(nn.Module):
 
         self.berttokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
         self.bertmodel = BertModel.from_pretrained('bert-base-uncased')
+
+        # Do not Finetune
+        for i, p in enumerate(self.bertmodel.parameters()):
+            p.requires_grad = False
     
     def forward(self, inputs):
         toks = self.berttokenizer(inputs, return_tensors="pt", padding=True)
