@@ -82,14 +82,14 @@ class LanguageGeneration(nn.Module):
         )
         self.projection = nn.Linear(512, vocab_size)
     
-    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=100):
+    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=100, device="cuda"):
         # hidden_state: (batch_size, ldim + vdim)
 
         hidden_state = hidden_state.view(1, hidden_state.size(0), hidden_state.size(1))
         if inputs is not None:
             # Train phase
             embs = self.embedding(inputs)
-            op, _ = self.lstm1(embs, (hidden_state, torch.zeros_like(hidden_state)))
+            op, _ = self.lstm1(embs, (hidden_state, torch.zeros_like(hidden_state).to(device)))
             op, _ = self.lstm2(op)
             op = self.projection(op)
             return op
@@ -98,9 +98,9 @@ class LanguageGeneration(nn.Module):
 
             batch_size = hidden_state.size(1)
             
-            inputs = torch.ones((batch_size, 1)).long() * sos_tok_id
+            inputs = torch.ones((batch_size, 1)).long().to(device) * sos_tok_id
 
-            hidden1 = (hidden_state, torch.zeros_like(hidden_state))
+            hidden1 = (hidden_state, torch.zeros_like(hidden_state).to(device))
             hidden2 = None
             outputs = []
             for i in range(max_len):
@@ -129,7 +129,7 @@ class SceneDescription(nn.Module):
         self.classification = Classification(num_answers)
         self.language_generation = LanguageGeneration(vocab_size)
     
-    def forward(self, language_input, vision_input, language_output=None, max_len=30, sos_tok_id=100):
+    def forward(self, language_input, vision_input, language_output=None, max_len=30, sos_tok_id=100, device="cuda"):
         language_embeddings = self.language_understanding(language_input)
         vision_embeddings = self.vision_understanding(vision_input)
 
@@ -140,7 +140,8 @@ class SceneDescription(nn.Module):
             vqa_embeddings,
             inputs=language_output,
             max_len=max_len,
-            sos_tok_id=sos_tok_id
+            sos_tok_id=sos_tok_id,
+            device=device
         )
 
         return classification_op, generation_op
