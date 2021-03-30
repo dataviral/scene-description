@@ -23,8 +23,8 @@ class LanguageInput(nn.Module):
         for i, p in enumerate(self.bertmodel.parameters()):
             p.requires_grad = False
     
-    def forward(self, inputs):
-        toks = self.berttokenizer(inputs, return_tensors="pt", padding=True)
+    def forward(self, inputs, device="cuda"):
+        toks = self.berttokenizer(inputs, return_tensors="pt", padding=True).to(device)
         op = self.bertmodel(**toks)
         return op.last_hidden_state[:, 0, :]
 
@@ -130,7 +130,7 @@ class SceneDescription(nn.Module):
         self.language_generation = LanguageGeneration(vocab_size)
     
     def forward(self, language_input, vision_input, language_output=None, max_len=30, sos_tok_id=100, device="cuda"):
-        language_embeddings = self.language_understanding(language_input)
+        language_embeddings = self.language_understanding(language_input, device=device)
         vision_embeddings = self.vision_understanding(vision_input)
 
         vqa_embeddings = torch.cat([language_embeddings, vision_embeddings], dim=-1)
