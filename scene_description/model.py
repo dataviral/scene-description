@@ -82,7 +82,7 @@ class LanguageGeneration(nn.Module):
         )
         self.projection = nn.Linear(512, vocab_size)
     
-    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=100, device="cuda"):
+    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=globals.BOS_IDX, device="cuda"):
         # hidden_state: (batch_size, ldim + vdim)
 
         hidden_state = hidden_state.view(1, hidden_state.size(0), hidden_state.size(1))
