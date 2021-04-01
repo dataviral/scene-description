@@ -10,6 +10,7 @@ import torch
 import torch.nn as nn
 from transformers import BertTokenizerFast, BertModel
 from torchvision.models import resnet18
+from . import global_vars
 
 class LanguageInput(nn.Module):
 
@@ -82,7 +83,7 @@ class LanguageGeneration(nn.Module):
         )
         self.projection = nn.Linear(512, vocab_size)
     
-    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=globals.BOS_IDX, device="cuda"):
+    def forward(self, hidden_state, inputs=None, max_len=30, sos_tok_id=global_vars.BOS_IDX, device="cuda"):
         # hidden_state: (batch_size, ldim + vdim)
 
         hidden_state = hidden_state.view(1, hidden_state.size(0), hidden_state.size(1))
@@ -129,7 +130,7 @@ class SceneDescription(nn.Module):
         self.classification = Classification(num_answers)
         self.language_generation = LanguageGeneration(vocab_size)
     
-    def forward(self, language_input, vision_input, language_output=None, max_len=30, sos_tok_id=100, device="cuda"):
+    def forward(self, language_input, vision_input, language_output=None, max_len=30, sos_tok_id=global_vars.BOS_IDX, device="cuda"):
         language_embeddings = self.language_understanding(language_input, device=device)
         vision_embeddings = self.vision_understanding(vision_input)
 
