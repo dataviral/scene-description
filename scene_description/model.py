@@ -105,16 +105,11 @@ class LanguageGeneration(nn.Module):
             hidden2 = None
             outputs = []
             for i in range(max_len):
-                print(inputs, inputs.shape);embs = self.embedding(inputs)
-                print(embs.shape)
                 op, hidden1 = self.lstm1(embs, hidden1)
-                print(op.shape)
                 op, hidden2 = self.lstm2(op, hidden2)
-                print(op.shape)
                 op = self.projection(op)
                 inputs = nn.functional.softmax(op, dim=-1).argmax(dim=-1)
                 outputs.append(op)
-                print("----")
             return torch.cat(outputs, dim=1)
 
 class SceneDescription(nn.Module):
