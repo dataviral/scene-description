@@ -105,6 +105,7 @@ class LanguageGeneration(nn.Module):
             hidden2 = None
             outputs = []
             for i in range(max_len):
+                embs = self.embedding(inputs)
                 op, hidden1 = self.lstm1(embs, hidden1)
                 op, hidden2 = self.lstm2(op, hidden2)
                 op = self.projection(op)
